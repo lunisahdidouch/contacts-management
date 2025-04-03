@@ -17,11 +17,17 @@ public class ContractManagementService implements IContactManagementService{
 
     @Override
     public List<Contact> getContacts() {
-        return List.of();
+        contacts = (ArrayList<Contact>) fileService.readFromFile();
+        return contacts;
     }
 
     @Override
     public Contact searchContact(String name) {
+        for(Contact contact : contacts) {
+            if (Objects.equals(contact.getName(), name)) {
+                return contact;
+            }
+        }
         return null;
     }
 

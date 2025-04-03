@@ -4,22 +4,23 @@ import org.example.models.Contact;
 import org.example.services.ContractManagementService;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
-    static Scanner scanner;
+    static Scanner scanner = new Scanner(System.in);
     static int option;
     static ArrayList<Contact> contacts;
-    ContractManagementService service = new ContractManagementService();
+    static ContractManagementService service = new ContractManagementService();
 
     public Main() {
         scanner = new Scanner(System.in);
     }
 
     public static void main(String[] args) {
-        contacts = JsonFileReader.readContacts();
-        scanner = new Scanner(System.in);
+//        contacts = JsonFileReader.readContacts();
+//        scanner = new Scanner(System.in);
         menu();
     }
 
@@ -45,53 +46,70 @@ public class Main {
             System.out.println("Contact added successfully!");
             secondMenu();
         } else if (option == 2) {
-            if (contacts.isEmpty()) {
+            List<Contact> listOfContacts = service.getContacts();
+
+            if (listOfContacts.isEmpty()) {
                 System.out.println("No contacts found.");
             } else {
-                for(Contact contact : contacts) {
-                    System.out.println(contact.getName());
+                for (Contact listOfContact : listOfContacts) {
+                    System.out.println(listOfContact.getName());
                 }
             }
             secondMenu();
         } else if (option == 3) {
             System.out.println("Type in the name of the person you want to search for:");
             String searchQuery = scanner.nextLine();
-            boolean found = false;
-
-            for(Contact contact : contacts) {
-                if (Objects.equals(contact.getName(), searchQuery)) {
+//            boolean found = false;
+            Contact searchedContact = service.searchContact(searchQuery);
+//            for(Contact contact : contacts) {
+                if (searchedContact != null) {
                     System.out.println("Here is the contact information:");
-                    System.out.println("Name: " + contact.getName());
-                    System.out.println("Phone number: " + contact.getPhoneNumber());
-                    System.out.println("Email: " + contact.getEmail());
-                    System.out.println("Age: " + contact.getAge());
-                    found = true;
-                    break;
+                    System.out.println("Name: " + searchedContact.getName());
+                    System.out.println("Phone number: " + searchedContact.getPhoneNumber());
+                    System.out.println("Email: " + searchedContact.getEmail());
+                    System.out.println("Age: " + searchedContact.getAge());
+//                    found = true;
                 }
-            }
+                else{
+                    System.out.println("No contact found with that name");
+                }
+//            }
 
-            if (!found) {
-                System.out.println("No contact found with that name");
-            }
+//            if (!found) {
+//                System.out.println("No contact found with that name");
+//            }
 
             secondMenu();
         } else if (option == 4) {
-            System.out.println("What contact do you want to delete?");
+            System.out.println("Who would you like to delete from your contacts?");
             String deleteContact = scanner.nextLine();
+            Contact contactToDelete = service.searchContact(deleteContact);
+                if (contactToDelete != null) {
+                    System.out.println("Are you sure you want to delete " + contactToDelete.getName() + "? (yes/no)");
+                    String answer = scanner.nextLine();
+                    if (answer.equalsIgnoreCase("yes")) {
+                        service.deleteContact(deleteContact);
+                    }
+                    else{
+                        System.out.println("Contact has not been removed");
+                    }
+                }
+                else{
+                    System.out.println("No contact found with that name");
+                }
 
-            service.deleteContact(deleteContact);
 
-            if (!contactFound) {
-                System.out.println("No contact found with that name");
+//            if (!contactFound) {
+//                System.out.println("No contact found with that name");
+//            }
+
+                secondMenu();
+            } else if (option == 0) {
+                System.exit(0);
             }
-
-            secondMenu();
-        } else if (option == 0) {
-            System.exit(0);
         }
-    }
 
-    static void menu() {
+        static void menu() {
         System.out.println("\n\n\nWelcome to your contact management system");
         System.out.println("Choose an option below to continue:");
         System.out.println("1: Add contact\n2: View all contact\n3: Search contact\n4: Delete contact\n0: Exit");

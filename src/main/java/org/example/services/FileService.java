@@ -59,7 +59,6 @@ public class FileService implements IFileService {
         } catch (IOException e) {
             System.out.println("Error reading contacts file: " + e.getMessage());
         }
-
         return contactsList;
     }
 }
