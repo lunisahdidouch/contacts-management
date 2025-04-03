@@ -1,6 +1,8 @@
 package org.example;
 
-import java.io.PrintStream;
+import org.example.models.Contact;
+import org.example.services.ContractManagementService;
+
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -9,11 +11,15 @@ public class Main {
     static Scanner scanner;
     static int option;
     static ArrayList<Contact> contacts;
+    ContractManagementService service = new ContractManagementService();
 
     public Main() {
+        scanner = new Scanner(System.in);
     }
 
     public static void main(String[] args) {
+        contacts = JsonFileReader.readContacts();
+        scanner = new Scanner(System.in);
         menu();
     }
 
@@ -33,83 +39,84 @@ public class Main {
             }
 
             int age = scanner.nextInt();
+            scanner.nextLine();
             Contact newContact = new Contact(name, phoneNumber, email, age);
-            contacts.add(newContact);
+            service.addContact(newContact);
             System.out.println("Contact added successfully!");
             secondMenu();
         } else if (option == 2) {
-            for(Contact contact : contacts) {
-                System.out.print(contact.getName());
+            if (contacts.isEmpty()) {
+                System.out.println("No contacts found.");
+            } else {
+                for(Contact contact : contacts) {
+                    System.out.println(contact.getName());
+                }
             }
-
             secondMenu();
         } else if (option == 3) {
             System.out.println("Type in the name of the person you want to search for:");
             String searchQuery = scanner.nextLine();
+            boolean found = false;
 
             for(Contact contact : contacts) {
                 if (Objects.equals(contact.getName(), searchQuery)) {
-                    PrintStream var10000 = System.out;
-                    String var10001 = contact.getName();
-                    var10000.print("Here is the contact information:\nName: " + var10001 + "\nPhone number: " + contact.getPhoneNumber() + "\nEmail: " + contact.getEmail() + "\nAge: " + contact.getAge());
-                } else {
-                    System.out.println("No contact found with that name");
+                    System.out.println("Here is the contact information:");
+                    System.out.println("Name: " + contact.getName());
+                    System.out.println("Phone number: " + contact.getPhoneNumber());
+                    System.out.println("Email: " + contact.getEmail());
+                    System.out.println("Age: " + contact.getAge());
+                    found = true;
+                    break;
                 }
+            }
+
+            if (!found) {
+                System.out.println("No contact found with that name");
             }
 
             secondMenu();
         } else if (option == 4) {
             System.out.println("What contact do you want to delete?");
             String deleteContact = scanner.nextLine();
-            System.out.println("What contact do you want to delete?");
 
-            for(Contact contact : contacts) {
-                if (Objects.equals(contact.getName(), deleteContact)) {
-                    System.out.println("Are you sure want to delete " + contact.getName());
-                    String answer = scanner.nextLine();
-                    if (answer.equalsIgnoreCase("yes")) {
-                        contacts.remove(contact);
-                        System.out.println("Contact has successfully been removed");
-                        secondMenu();
-                    } else {
-                        System.out.println("Contact has not been removed");
-                        secondMenu();
-                    }
-                } else {
-                    System.out.println("No contact found with that name");
-                    secondMenu();
-                }
+            service.deleteContact(deleteContact);
+
+            if (!contactFound) {
+                System.out.println("No contact found with that name");
             }
 
             secondMenu();
         } else if (option == 0) {
             System.exit(0);
         }
-
     }
 
     static void menu() {
         System.out.println("\n\n\nWelcome to your contact management system");
         System.out.println("Choose an option below to continue:");
-        System.out.println("1: Add contact\n2: View all contact\n3: Search contact\n4: Delete contact\n5: Exit");
-        option = Integer.parseInt(scanner.next());
-        scanner.nextLine();
-        actions();
+        System.out.println("1: Add contact\n2: View all contact\n3: Search contact\n4: Delete contact\n0: Exit");
+
+        try {
+            option = Integer.parseInt(scanner.nextLine());
+            actions();
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid number");
+            menu();
+        }
     }
 
     static void secondMenu() {
         System.out.println("\n\n\nChoose an option:\n1: See menu again\n2: Exit");
-        int answer = scanner.nextInt();
-        if (answer == 2) {
-            System.exit(0);
-        } else {
-            menu();
+        try {
+            int answer = Integer.parseInt(scanner.nextLine());
+            if (answer == 2) {
+                System.exit(0);
+            } else {
+                menu();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid number");
+            secondMenu();
         }
-
-    }
-
-    static {
-        scanner = new Scanner(System.in);
-        contacts = new ArrayList();
     }
 }

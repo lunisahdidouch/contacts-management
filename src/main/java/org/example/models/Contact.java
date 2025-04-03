@@ -1,6 +1,6 @@
-package org.example;
+package org.example.models;
 
-class Contact {
+public class Contact {
     private String name;
     private String phoneNumber;
     private String email;
