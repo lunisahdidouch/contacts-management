@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ContractManagementService implements IContactManagementService{
+public class ContactManagementService implements IContactManagementService{
     ArrayList<Contact> contacts = new ArrayList<>();
     FileService fileService = new FileService();
     @Override
@@ -34,21 +34,13 @@ public class ContractManagementService implements IContactManagementService{
     @Override
     public void deleteContact(String name) {
         boolean contactFound = false;
-        for (int i = 0; i < contacts.size(); i++) {
+        for(int i = 0; i < contacts.size(); i++) {
             Contact contact = contacts.get(i);
             if (Objects.equals(contact.getName(), name)) {
                 contactFound = true;
-//                System.out.println("Are you sure you want to delete " + contact.getName() + "? (yes/no)");
-//                String answer = scanner.nextLine();
-//                if (answer.equalsIgnoreCase("yes")) {
                 contacts.remove(i);
-                    // Save to JSON after deleting
                 fileService.writeToFile(contacts);
-//                    JsonFileWriter.writeContacts(contacts);
-                    System.out.println("Contact has successfully been removed");
-//                } else {
-//                    System.out.println("Contact has not been removed");
-//                }
+                System.out.println("Contact has successfully been removed");
                 break;
             }
         }
